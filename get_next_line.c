@@ -6,7 +6,7 @@
 /*   By: shabibol <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 20:55:11 by shabibol          #+#    #+#             */
-/*   Updated: 2022/04/05 23:57:48 by shabibol         ###   ########.fr       */
+/*   Updated: 2022/04/06 00:15:47 by shabibol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdio.h>
@@ -60,19 +60,16 @@ char	*get_next_line(int fd)
 {
 	static char	*buffer[BUFFER_SIZE];
 	char		*line;
-	char		*res;
 	int			byte_read;
 
 	if (!fd)
 		return (0);
 	byte_read = 0;
-	while (BUFFER_SIZE > 0)
+	while (ft_strchr_boolean(res) == NULL)
 	{
 		byte_read = read(fd, buffer, BUFFER_SIZE);
-		while (ft_strchr_boolean(res) != 
-				res = ft_strjoin(res, buffer);
-		
+		line = ft_strjoin(res, buffer);
 	}
-	
+
 	return (line);
 }
