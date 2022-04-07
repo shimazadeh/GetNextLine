@@ -6,7 +6,7 @@
 /*   By: shabibol <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 20:55:11 by shabibol          #+#    #+#             */
-/*   Updated: 2022/04/06 19:24:44 by shabibol         ###   ########.fr       */
+/*   Updated: 2022/04/07 15:24:35 by shabibol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdio.h>
@@ -23,7 +23,7 @@ int	ft_strlen(char *s1)
 	return (i);
 }
 
-char	*ft_strlcpy(char *src, int size)
+char	*ft_strndup(char *src, int size)
 {
 	int		i;
 	char	*dest;
@@ -86,7 +86,7 @@ char	*ft_strfind(char *s1, char set)
 		i++;
 	if (s1[i] == set)
 	{
-		dest = ft_strlcpy(s1, i);
+		dest = ft_strndup(s1, i);
 		free(s1);
 		return (dest);
 	}
@@ -96,27 +96,32 @@ char	*ft_strfind(char *s1, char set)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	 buffer[BUFFER_SIZE + 1];
 	char		*line;
 	char		*res;
 	int			byte_read;
-//	int			BUFFER_SIZE;
 
 	if (!fd)
 		return (0);
-	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
-	byte_read = read(fd, buffer, BUFFER_SIZE);
-	line = ft_strlcpy(buffer, BUFFER_SIZE);
-	while (line && ft_strchr(line) == 0)
+//	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+	while ((byte_read = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
-		byte_read = read(fd, buffer, BUFFER_SIZE);
-		res = ft_strjoin(line, buffer);
-
+		buffer[byte_read] = '\0';
+		if (!line[0])
+			line = ft_strndup(buffer, byte_read + 1);
+		else
+		{
+			res = ft_strjoin(line, buffer);
+			free(line);
+			line = res;
+		}
+		if (ft_strchr(line) != 0)
+		{
+//			free(buffer);
+			return(ft_strfind(line, '\n'));
+		}
 	}
-	if (ft_strchr(line) != 0)
-		output = ft_strfind(line, '\n');
-	free(buffer);
-	return (line);
+	return (NULL);
 }
 
 int	main(int ac, char **av)
@@ -130,7 +135,9 @@ int	main(int ac, char **av)
 		printf("Error with reading the file\n");
 	else
 		printf("fd is : %d\n", fd);
-	printf("the line is: %s\n", get_next_line(fd));
+	printf("the first line is: %s\n", get_next_line(fd));
+	printf("the second line is: %s\n", get_next_line(fd));
+	printf("the third line is: %s\n", get_next_line(fd)); 
 	close(fd);
 	return (0);
 
