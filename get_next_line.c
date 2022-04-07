@@ -75,6 +75,18 @@ char	*ft_strchr(char *s1)
 	return (0);
 }
 
+char	*ft_strchr_temp(char *s1)
+{
+	if (!s1)
+		return (0);
+	while (*s1 && *s1 != '\n')
+		s1++;
+	if (*s1 == '\n')
+		s1++;
+		return (s1);
+	return (0);
+}
+
 char	*ft_strfind(char *s1, char set)
 {
 	int		i;
@@ -86,8 +98,7 @@ char	*ft_strfind(char *s1, char set)
 		i++;
 	if (s1[i] == set)
 	{
-		dest = ft_strndup(s1, i);
-		free(s1);
+		dest = ft_strndup(s1, i + 1);
 		return (dest);
 	}
 	else
@@ -97,28 +108,46 @@ char	*ft_strfind(char *s1, char set)
 char	*get_next_line(int fd)
 {
 	static char	 buffer[BUFFER_SIZE + 1];
-	char		*line;
-	char		*res;
+	static char	*line;
+	char	*res;
 	int			byte_read;
+	char		*temp;
+	char		*tmp;
 
 	if (!fd)
 		return (0);
-//	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+	if (buffer[0])
+	{
+		temp = ft_strchr(buffer);
+		if (ft_strchr(temp))
+			{ 
+				tmp = ft_strfind(temp, '\n');
+			//	free(temp);
+				temp = tmp;
+			}
+		res = ft_strjoin(line, temp);
+		free(line);
+		line = res;
+	}
 	while ((byte_read = read(fd, buffer, BUFFER_SIZE)) > 0)
 	{
 		buffer[byte_read] = '\0';
-		if (!line[0])
+		if (!line)
 			line = ft_strndup(buffer, byte_read + 1);
 		else
 		{
-			res = ft_strjoin(line, buffer);
-			free(line);
+			if (ft_strchr(buffer) == 0)
+				res = ft_strjoin(line, buffer);
+			else
+			{
+				temp = ft_strfind(buffer, '\n');
+				res = ft_strjoin(line, temp);
+				free(line);
+				line = res;
+				return (line);
+			}
+//			free(line);
 			line = res;
-		}
-		if (ft_strchr(line) != 0)
-		{
-//			free(buffer);
-			return(ft_strfind(line, '\n'));
 		}
 	}
 	return (NULL);
@@ -135,9 +164,13 @@ int	main(int ac, char **av)
 		printf("Error with reading the file\n");
 	else
 		printf("fd is : %d\n", fd);
-	printf("the first line is: %s\n", get_next_line(fd));
-	printf("the second line is: %s\n", get_next_line(fd));
-	printf("the third line is: %s\n", get_next_line(fd)); 
+	printf("the first round res is: %s\n", get_next_line(fd));
+	printf("\n");
+	printf("the second round res is: %s\n", get_next_line(fd));
+	printf("\n");
+	printf("the third round res is: %s\n", get_next_line(fd));
+	printf("\n");
+	printf("the fourth round res is: %s\n", get_next_line(fd));
 	close(fd);
 	return (0);
 
