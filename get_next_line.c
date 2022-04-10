@@ -6,13 +6,14 @@
 /*   By: shabibol <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 20:55:11 by shabibol          #+#    #+#             */
-/*   Updated: 2022/04/08 21:36:17 by shabibol         ###   ########.fr       */
+/*   Updated: 2022/04/10 19:36:33 by shabibol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+
 int	ft_strlen(char *s1)
 {
 	int	i;
@@ -28,8 +29,8 @@ char	*ft_strndup(char *src, int size)
 	int		i;
 	char	*dest;
 
-	i= 0;
-	dest = (char *)malloc(sizeof(char) * size);
+	i = 0;
+	dest = (char *)malloc(sizeof(char) * size + 1);
 	if (!src || !dest)
 		return (0);
 	while (src[i] && i != size)
@@ -80,6 +81,7 @@ char	*ft_strfind(char *s1, char set)
 {
 	int		i;
 	char	*dest;
+
 	i = 0;
 	if (!s1 || !set)
 		return (0);
@@ -96,7 +98,7 @@ char	*ft_strfind(char *s1, char set)
 
 void	ft_update_buffer(char *buffer, int size)
 {
-	int i;
+	int	i;
 	int	j;
 
 	j = 0;
@@ -109,7 +111,7 @@ void	ft_update_buffer(char *buffer, int size)
 		j++;
 		i++;
 	}
-	while (buffer[i])
+	while (i < size && buffer[j])
 	{
 		buffer[j] = buffer[i];
 		i++;
@@ -121,7 +123,92 @@ void	ft_update_buffer(char *buffer, int size)
 		j++;
 	}
 }
+/*
+char	*ft_assign_NULL(char *dest)
+{
+	char	*src;
+	int		i;
 
+	src = "(null)";
+	while (src[i] && dest[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	while (dest[i])
+	{
+		dest[i] = '\0';
+		i++;
+	}
+	if (!src)
+		
+	return (src);
+}*/
+
+char	*get_next_line(int fd)
+{
+	static char		buffer[BUFFER_SIZE + 1];
+	static char		*line;
+	char			*res;
+	int				byte_read;
+	char			*temp;
+
+	if (!fd)
+		return (0);
+	if (buffer[0])
+	{
+		if (ft_strchr(buffer))
+		{
+			temp = ft_strfind(buffer, '\n');
+			res = ft_strjoin(line, temp);
+			free(line);
+			line = res;
+			free(temp);
+			ft_update_buffer(buffer, BUFFER_SIZE);
+			return (line);
+		}
+		res = ft_strjoin(line, buffer);
+		free(line);
+		line = res;
+	}
+	while (fd)
+	{
+		byte_read = read(fd, buffer, BUFFER_SIZE);
+		buffer[byte_read] = '\0';
+		if (!line)
+		{
+			line = ft_strndup(buffer, byte_read + 1);
+			if (ft_strchr(line) != 0)
+			{
+				temp = ft_strfind(line, '\n');
+				free(line);
+				line = temp;
+				ft_update_buffer(buffer, BUFFER_SIZE);
+				return (line);
+			}
+		}
+		else
+		{
+			if (ft_strchr(buffer) == 0)
+				res = ft_strjoin(line, buffer);
+			else
+			{
+				temp = ft_strfind(buffer, '\n');
+				res = ft_strjoin(line, temp);
+				free(line);
+				line = res;
+				free(temp);
+				ft_update_buffer(buffer, BUFFER_SIZE);
+				return (line);
+			}
+			line = res;
+		}
+		if (byte_read == 0)
+			return (NULL);
+	}
+	return (NULL);
+}
+/*
 char	*get_next_line(int fd)
 {
 	static char	 buffer[BUFFER_SIZE + 1];
@@ -135,11 +222,12 @@ char	*get_next_line(int fd)
 	if (buffer[0])
 	{
 		if (ft_strchr(buffer))
-			{ 
+			{
 				temp = ft_strfind(buffer, '\n');
 				res = ft_strjoin(line, temp);
 				free(line);
 				line = res;
+				free(temp);
 				ft_update_buffer(buffer, BUFFER_SIZE);
 				return (line);
 			}
@@ -151,7 +239,17 @@ char	*get_next_line(int fd)
 	{
 		buffer[byte_read] = '\0';
 		if (!line)
+		{
 			line = ft_strndup(buffer, byte_read + 1);
+			if (ft_strchr(line) != 0)
+			{
+				temp = ft_strfind(line, '\n');
+				free(line);
+				line = temp;
+				ft_update_buffer(buffer, BUFFER_SIZE);
+				return (line);
+			}
+		}
 		else
 		{
 			if (ft_strchr(buffer) == 0)
@@ -162,36 +260,43 @@ char	*get_next_line(int fd)
 				res = ft_strjoin(line, temp);
 				free(line);
 				line = res;
+				free(temp);
 				ft_update_buffer(buffer, BUFFER_SIZE);
 				return (line);
 			}
 			line = res;
 		}
 	}
-	if (byte_read == 0)
-
-	return (line);
-}
+	return (NULL);
+}*/
 
 int	main(int ac, char **av)
 {
-	int fd;
+	int	fd;
+
 	(void)ac;
 	(void)av;
-
 	fd = open("test.txt", O_RDONLY);
 	if (fd == -1)
 		printf("Error with reading the file\n");
 	else
 		printf("fd is : %d\n", fd);
-	printf("the first round res is: %s\n", get_next_line(fd));
-	printf("the second round res is: %s\n", get_next_line(fd));
-	printf("the third round res is: %s\n", get_next_line(fd));
-	printf("the fourth round res is: %s\n", get_next_line(fd));
-	printf("the fifth round res is: %s\n", get_next_line(fd));
-	printf("the sixth round res is: %s\n", get_next_line(fd));
-	printf("the seventh round res is: %s\n", get_next_line(fd));
-	printf("the eight round res is: %s\n", get_next_line(fd));
+	printf("the first round res is: %s", get_next_line(fd));
+	printf("the second round res is: %s", get_next_line(fd));
+	printf("the third round res is: %s", get_next_line(fd));
+	printf("the fourth round res is: %s", get_next_line(fd));
+	printf("the fifth round res is: %s", get_next_line(fd));
+	printf("the sixth round res is: %s", get_next_line(fd));
+	printf("the seventh round res is: %s", get_next_line(fd));
+	printf("the eight round res is: %s", get_next_line(fd));
+	printf("the nine round res is: %s", get_next_line(fd));
+	printf("the tenth round res is: %s", get_next_line(fd));
+	printf("the 11th  round res is: %s", get_next_line(fd));
+	printf("the 12th round res is: %s", get_next_line(fd));
+	printf("the 13th  round res is: %s", get_next_line(fd));
+	printf("the 14th round res is: %s", get_next_line(fd));
+	printf("the 15th round res is: %s", get_next_line(fd));
+	printf("the 16th round res is: %s", get_next_line(fd));
 	close(fd);
 	return (0);
 }
