@@ -23,9 +23,9 @@ int	ft_strlen(char *s1);
 
 char	*ft_strndup(char *src, int size);
 char	*ft_strjoin(char *s1, char *s2);
-char	*ft_strchr(char *s1);
+int     ft_strchr(char *s1);
 char	*ft_strfind(char *s1, char set);
 char	*get_next_line(int fd);
 void	ft_update_buffer(char *buffer, int size);
-
+void    ft_update_line(char *line, int size);
 #endif

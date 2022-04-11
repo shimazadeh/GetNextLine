@@ -27,8 +27,10 @@ char	*ft_strndup(char *src, int size)
 	char	*dest;
 
 	i = 0;
+	if (!src)
+		return (0);
 	dest = (char *)malloc(sizeof(char) * size + 1);
-	if (!src || !dest)
+	if (!dest)
 		return (0);
 	while (src[i] && i != size)
 	{
@@ -61,14 +63,14 @@ char	*ft_strjoin(char *s1, char *s2)
 	return (dst);
 }
 
-char	*ft_strchr(char *s1)
+int	ft_strchr(char *s1)
 {
-	if (!s1)
+	if (!s1 || s1 == NULL)
 		return (0);
 	while (*s1 && *s1 != '\n')
 		s1++;
 	if (*s1 == '\n')
-		return (s1);
+		return (1);
 	return (0);
 }
 
@@ -88,6 +90,5 @@ char	*ft_strfind(char *s1, char set)
 		free(s1);
 		return (dest);
 	}
-	else
-		return (0);
+	return (0);
 }

@@ -38,6 +38,21 @@ void	ft_update_buffer(char *buffer, int size)
 		j++;
 	}
 }
+void	ft_update_line(char *line, int size)
+{
+	int	i;
+
+	i = 0;
+	while (line[i] && line[i] != '\n')
+		i++;
+	if (line[i] == '\n')
+		i++;
+	while (i != size && line[i])
+	{
+		line[i] = '\0';
+		i++;
+	}
+}
 
 char	*get_next_line(int fd)
 {
@@ -55,18 +70,22 @@ char	*get_next_line(int fd)
 	{
 		byte_read = read(fd, buffer, BUFFER_SIZE);
 		if (byte_read == 0)
+		{
+			free(line);
 			return (NULL);
+		}
 		buffer[byte_read] = '\0';
 		temp = ft_strjoin(line, buffer);
 		free(line);
 		line = temp;
 	}
-	line = ft_strfind(line, '\n');
+	ft_update_line(line, ft_strlen(line));
+//	line = ft_strfind(line, '\n');
 	ft_update_buffer(buffer, BUFFER_SIZE);
-	tosave = ft_strndup(buffer, ft_strlen(buffer));
+	tosave = ft_strndup(buffer, BUFFER_SIZE);
 	return (line);
 }
-/*
+
 int	main(int ac, char **av)
 {
 	int		fd;
@@ -74,7 +93,7 @@ int	main(int ac, char **av)
 
 	(void)ac;
 	(void)av;
-	fd = open("41_no_nl", O_RDONLY);
+	fd = open("nl", O_RDONLY);
 	if (fd == -1)
 		printf("Error with reading the file\n");
 	else
@@ -86,4 +105,4 @@ int	main(int ac, char **av)
 	printf("%s", res);
 	close(fd);
 	return (0);
-}*/
+}
