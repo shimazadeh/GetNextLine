@@ -16,7 +16,9 @@ int	ft_strlen(char *s1)
 	int	i;
 
 	i = 0;
-	while (s1 && s1[i] != '\0')
+	if (!s1)
+		return (0);
+	while (s1[i] != '\0')
 		i++;
 	return (i);
 }
@@ -27,12 +29,12 @@ char	*ft_strndup(char *src, int size)
 	char	*dest;
 
 	i = 0;
-	if (!src)
-		return (0);
+	if (!src || !*src)
+		return (NULL);
 	dest = (char *)malloc(sizeof(char) * size + 1);
 	if (!dest)
-		return (0);
-	while (src[i] && i != size)
+		return (NULL);
+	while (src[i] && i < size)
 	{
 		dest[i] = src[i];
 		i++;
@@ -49,9 +51,11 @@ char	*ft_strjoin(char *s1, char *s2)
 
 	i = 0;
 	j = 0;
+//	if (!s1 || !s2)
+//		return (NULL);
 	dst = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2)) + 1);
 	if (!dst)
-		return (0);
+		return (NULL);
 	while (s1 && s1[i] != '\0')
 	{
 		dst[i] = s1[i];
@@ -81,7 +85,7 @@ char	*ft_strfind(char *s1, char set)
 
 	i = 0;
 	if (!s1 || !set)
-		return (0);
+		return (NULL);
 	while (s1 && s1[i] != set)
 		i++;
 	if (s1[i] == set)
@@ -90,5 +94,5 @@ char	*ft_strfind(char *s1, char set)
 		free(s1);
 		return (dest);
 	}
-	return (0);
+	return (NULL);
 }
