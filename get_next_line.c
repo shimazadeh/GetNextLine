@@ -37,7 +37,7 @@ void	ft_update_buffer(char *buffer, int size)
 		i++;
 		j++;
 	}
-	while (j < size)
+	while (j < size && buffer[j])
 	{
 		buffer[j] = '\0';
 		j++;
@@ -70,21 +70,30 @@ char	*get_next_line(int fd)
 	if (fd < 0 || BUFFER_SIZE < 0)
 		return (NULL);
 	line = ft_strndup(tosave, ft_strlen(tosave));
+	if (ft_strchr(line))
+	{
+		ft_update_buffer(tosave, ft_strlen(tosave));
+		ft_update_line(line, ft_strlen(line));
+		return (line);
+	}
 	free(tosave);
 	byte_read = 1;
 	buffer[0] = 0;
-	while (byte_read && !ft_strchr(buffer))
+	while (byte_read && !ft_strchr(buffer) && !ft_strchr(line))
 	{
 		byte_read = read(fd, buffer, BUFFER_SIZE);
-		if (byte_read == 0)
-			return (line);
+		//if (byte_read == 0)
+		//	return (line);
 		if (byte_read < 0)
+			return (NULL);
+		if (byte_read == 0 && !line)
 			return (NULL);
 		buffer[byte_read] = '\0';
 		temp = ft_strjoin(line, buffer);
 		free(line);
 		line = temp;
 	}
+	
 	ft_update_line(line, ft_strlen(line));
 //	line = ft_strfind(line, '\n');
 	ft_update_buffer(buffer, BUFFER_SIZE);
@@ -99,11 +108,11 @@ int	main(int ac, char **av)
 
 	(void)ac;
 	(void)av;
-	fd = open("41_with_nl", O_RDONLY);
+	fd = open("41_no_nl", O_RDONLY);
 	if (fd == -1)
 		printf("Error with reading the file\n");
-	else
-		printf("fd is : %d\n", fd);
+//	else
+//		printf("fd is : %d\n", fd);
 	while ((res = get_next_line(fd)))
 	{
 		printf("%s", res);
