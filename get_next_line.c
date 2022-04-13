@@ -6,7 +6,7 @@
 /*   By: shabibol <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 20:55:11 by shabibol          #+#    #+#             */
-/*   Updated: 2022/04/13 16:58:27 by shabibol         ###   ########.fr       */
+/*   Updated: 2022/04/13 18:22:07 by shabibol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
@@ -57,25 +57,71 @@ void	ft_update_line(char *line, int size)
 	}
 }
 
-char	*ft_create_line(char *buffer,int byte_read, char *line)
+char	*get_next_line(int fd)
 {
-	char	*temp;
+	static char			buffer[BUFFER_SIZE + 1];
+	char				*line;
+	int					byte_read;
+	char				*temp;
 
-	if (byte_read == 0 && !line)
+	if (fd < 0 || BUFFER_SIZE < 0)
 		return (NULL);
-	buffer[byte_read] = '\0';
-	temp = ft_strjoin(line, buffer);
-	free(line);
-	return (temp);
+	line = ft_strndup(buffer, ft_strlen(buffer));
+	byte_read = 1;
+	while (byte_read && !ft_gnl_strchr(buffer) && !ft_gnl_strchr(line))
+	{
+		byte_read = read(fd, buffer, BUFFER_SIZE);
+		if (byte_read < 0)
+			return (NULL);
+		if (byte_read == 0 && !line)
+			return (NULL);
+		buffer[byte_read] = '\0';
+		temp = ft_strjoin(line, buffer);
+		free(line);
+		line = temp;
+	}
+	ft_update_buffer(buffer, BUFFER_SIZE);
+	ft_update_line(line, ft_strlen(line));
+	return (line);
 }
-
+/*
 char	*get_next_line(int fd)
 {
 	static char		*tosave;
 	char			buffer[BUFFER_SIZE + 1];
 	char			*line;
 	int				byte_read;
-//	char			*temp;
+
+	if (fd < 0 || BUFFER_SIZE < 0)
+		return (NULL);
+	line = ft_strndup(tosave, ft_strlen(tosave));
+	byte_read = 1;
+	buffer[0] = 0;
+	while (byte_read && !ft_strchr(buffer) && !ft_strchr(line))
+	{
+		byte_read = read(fd, buffer, BUFFER_SIZE);
+		if (byte_read < 0)
+			return (NULL);
+		line = ft_create_line(buffer, byte_read, line);
+	}
+	if (ft_strchr(tosave))
+		ft_update_buffer(tosave, ft_strlen(tosave));
+	else
+	{
+		ft_update_buffer(buffer, BUFFER_SIZE);
+		free(tosave);
+		tosave = ft_strndup(buffer, BUFFER_SIZE);
+	}
+	ft_update_line(line, ft_strlen(line));
+	return (line);
+}*/
+/*
+char	*get_next_line(int fd)
+{
+	static char		*tosave;
+	char			buffer[BUFFER_SIZE + 1];
+	char			*line;
+	int				byte_read;
 
 	if (fd < 0 || BUFFER_SIZE < 0)
 		return (NULL);
@@ -94,19 +140,21 @@ char	*get_next_line(int fd)
 		byte_read = read(fd, buffer, BUFFER_SIZE);
 		if (byte_read < 0)
 			return (NULL);
-/*		if (byte_read == 0 && !line)
-			return (NULL);
-		buffer[byte_read] = '\0';
-		temp = ft_strjoin(line, buffer);
-		free(line);
-		line = temp;*/
 		line = ft_create_line(buffer, byte_read, line);
 	}
+	if (ft_strchr(tosave))
+		ft_update_buffer(tosave, ft_strlen(tosave));
+	else
+	{
+		ft_update_buffer(buffer, BUFFER_SIZE);
+		free(tosave);
+		tosave = ft_strndup(buffer, BUFFER_SIZE);
+	}
 	ft_update_line(line, ft_strlen(line));
-	ft_update_buffer(buffer, BUFFER_SIZE);
-	tosave = ft_strndup(buffer, BUFFER_SIZE);
+//	ft_update_buffer(buffer, BUFFER_SIZE);
+//	tosave = ft_strndup(buffer, BUFFER_SIZE);
 	return (line);
-}
+}*/
 /*
 int	main(int ac, char **av)
 {
