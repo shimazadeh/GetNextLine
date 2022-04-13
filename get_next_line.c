@@ -6,7 +6,7 @@
 /*   By: shabibol <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 20:55:11 by shabibol          #+#    #+#             */
-/*   Updated: 2022/04/11 18:51:15 by shabibol         ###   ########.fr       */
+/*   Updated: 2022/04/13 16:58:27 by shabibol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
@@ -18,11 +18,6 @@ void	ft_update_buffer(char *buffer, int size)
 
 	j = 0;
 	i = 0;
-/*	if (!buffer)
-	{
-			buffer == NULL;
-			return ;
-	}*/
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
 	if (buffer[i] == '\n')
@@ -43,11 +38,14 @@ void	ft_update_buffer(char *buffer, int size)
 		j++;
 	}
 }
+
 void	ft_update_line(char *line, int size)
 {
 	int	i;
 
 	i = 0;
+	if (!line)
+		return ;
 	while (line[i] && line[i] != '\n')
 		i++;
 	if (line[i] == '\n')
@@ -59,13 +57,25 @@ void	ft_update_line(char *line, int size)
 	}
 }
 
+char	*ft_create_line(char *buffer,int byte_read, char *line)
+{
+	char	*temp;
+
+	if (byte_read == 0 && !line)
+		return (NULL);
+	buffer[byte_read] = '\0';
+	temp = ft_strjoin(line, buffer);
+	free(line);
+	return (temp);
+}
+
 char	*get_next_line(int fd)
 {
 	static char		*tosave;
 	char			buffer[BUFFER_SIZE + 1];
 	char			*line;
 	int				byte_read;
-	char			*temp;
+//	char			*temp;
 
 	if (fd < 0 || BUFFER_SIZE < 0)
 		return (NULL);
@@ -82,37 +92,32 @@ char	*get_next_line(int fd)
 	while (byte_read && !ft_strchr(buffer) && !ft_strchr(line))
 	{
 		byte_read = read(fd, buffer, BUFFER_SIZE);
-		//if (byte_read == 0)
-		//	return (line);
 		if (byte_read < 0)
 			return (NULL);
-		if (byte_read == 0 && !line)
+/*		if (byte_read == 0 && !line)
 			return (NULL);
 		buffer[byte_read] = '\0';
 		temp = ft_strjoin(line, buffer);
 		free(line);
-		line = temp;
+		line = temp;*/
+		line = ft_create_line(buffer, byte_read, line);
 	}
-	
 	ft_update_line(line, ft_strlen(line));
-//	line = ft_strfind(line, '\n');
 	ft_update_buffer(buffer, BUFFER_SIZE);
 	tosave = ft_strndup(buffer, BUFFER_SIZE);
 	return (line);
 }
-
+/*
 int	main(int ac, char **av)
 {
 	int		fd;
 	char	*res;
 
-	(void)ac;
-	(void)av;
-	fd = open("41_no_nl", O_RDONLY);
+	fd = open(av[1], O_RDONLY);
 	if (fd == -1)
 		printf("Error with reading the file\n");
-//	else
-//		printf("fd is : %d\n", fd);
+	else
+		printf("fd is : %d\n", fd);
 	while ((res = get_next_line(fd)))
 	{
 		printf("%s", res);
@@ -121,4 +126,4 @@ int	main(int ac, char **av)
 	printf("%s", res);
 	close(fd);
 	return (0);
-}
+}*/

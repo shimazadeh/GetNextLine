@@ -6,7 +6,7 @@
 /*   By: shabibol <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/11 16:59:24 by shabibol          #+#    #+#             */
-/*   Updated: 2022/04/11 18:51:17 by shabibol         ###   ########.fr       */
+/*   Updated: 2022/04/13 15:56:01 by shabibol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "get_next_line.h"
@@ -51,8 +51,6 @@ char	*ft_strjoin(char *s1, char *s2)
 
 	i = 0;
 	j = 0;
-//	if (!s1 || !s2)
-//		return (NULL);
 	dst = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2)) + 1);
 	if (!dst)
 		return (NULL);
